@@ -1,0 +1,73 @@
+ID: mta_Fiori3DarkThemeHTML5App
+_schema-version: '2.1'
+parameters:
+  deploy_mode: html5-repo
+version: 0.0.1
+modules:
+  - name: mta_Fiori3DarkThemeHTML5App_appRouter
+    type: approuter.nodejs
+    path: mta_Fiori3DarkThemeHTML5App_appRouter
+    parameters:
+      disk-quota: 256M
+      memory: 256M
+    requires:
+      - name: mta_Fiori3DarkThemeHTML5App_html5_repo_runtime
+      - name: uaa_mta_Fiori3DarkThemeHTML5App
+      - name: portal_resources_mta_Fiori3DarkThemeHTML5App
+  - name: mta_Fiori3DarkThemeHTML5App_ui_deployer
+    type: com.sap.html5.application-content
+    path: mta_Fiori3DarkThemeHTML5App_ui_deployer
+    requires:
+      - name: mta_Fiori3DarkThemeHTML5App_html5_repo_host
+    build-parameters:
+      requires:
+        - name: Fiori3DarkThemeHTML5App
+          artifacts:
+            - './*'
+          target-path: resources/Fiori3DarkThemeHTML5App
+  - name: Fiori3DarkThemeHTML5App
+    type: html5
+    path: Fiori3DarkThemeHTML5App
+    build-parameters:
+      builder: grunt
+      supported-platforms: []
+      build-result: dist
+  - name: DarkFLP
+    type: com.sap.portal.content
+    path: DarkFLP
+    parameters:
+      stack: cflinuxfs3
+      memory: 128M
+      buildpack: 'https://github.com/cloudfoundry/nodejs-buildpack/releases/download/v1.6.39/nodejs-buildpack-cflinuxfs3-v1.6.39.zip'
+    requires:
+      - name: portal_resources_mta_Fiori3DarkThemeHTML5App
+      - name: uaa_mta_Fiori3DarkThemeHTML5App
+      - name: mta_Fiori3DarkThemeHTML5App_html5_repo_host
+      - name: mta_Fiori3DarkThemeHTML5App_ui_deployer
+resources:
+  - name: mta_Fiori3DarkThemeHTML5App_html5_repo_runtime
+    parameters:
+      service-plan: app-runtime
+      service: html5-apps-repo
+    type: org.cloudfoundry.managed-service
+  - name: mta_Fiori3DarkThemeHTML5App_html5_repo_host
+    parameters:
+      service-plan: app-host
+      service: html5-apps-repo
+    type: org.cloudfoundry.managed-service
+  - name: uaa_mta_Fiori3DarkThemeHTML5App
+    parameters:
+      path: ./xs-security.json
+      service-plan: application
+      service: xsuaa
+    type: org.cloudfoundry.managed-service
+  - name: dest_mta_Fiori3DarkThemeHTML5App
+    parameters:
+      service-plan: lite
+      service: destination
+    type: org.cloudfoundry.managed-service
+  - name: portal_resources_mta_Fiori3DarkThemeHTML5App
+    parameters:
+      service-plan: standard
+      service: portal
+    type: org.cloudfoundry.managed-service
